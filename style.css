@@ -1,0 +1,225 @@
+body{
+    color: rgb(26, 26, 26);
+    font-family: sans-serif;
+}
+#list{
+    /* border: 1px solid rgb(185, 185, 185); */
+    width: calc(100vw - 250px);
+    margin-left: 100px;
+    height: calc(100vh - 250px);
+    margin-top: 100px;
+    box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+    padding: 20px;
+}
+#list_table_header{
+    border-bottom: 1px solid rgb(219, 219, 219);
+    height: 60px;
+    width: 100%;
+    display: flex;
+    /* flex-direction: column;*/
+    align-items: center;
+}
+#list_table_div{
+    width: 100%;
+    height: calc(100% - 70px);
+    overflow-y: scroll;
+}
+#list_table{
+    width: calc(100% - 5px);
+    /* height: 100%; */
+    border-collapse:collapse;
+    overflow-y: scroll;
+}
+
+#list_table thead th{
+    position: sticky;
+    top: 2px;
+}
+
+#list .header_row{
+    background-color: white;
+}
+#list th{
+    padding: 5px;
+    border-radius: 4px;
+    background-color: white;
+}
+#list td{
+    color:rgb(63, 63, 63);
+    vertical-align: middle;
+}
+#list .id_header{
+    width: 5%;
+}
+#list .partner_header{
+    width: 45%;
+}
+#list .key_header{
+    width: 45%;
+}
+#list .actions_header{
+    width: 5%;
+}
+#list .entry_row{
+    background-color: transparent;
+    transition: 0.2s;
+}
+#list .entry_row:hover{
+    background-color: rgb(240, 240, 228);
+}
+#list .entry_row_selected{
+    background-color:  rgb(235, 233, 222);
+}
+#list .entry_row_selected:hover{
+    background-color:  rgb(235, 233, 222);
+}
+
+#list .note_row{
+    background-color:  transparent;
+    border-radius: 8px;
+    border-top: 0px;
+    transition: 0.2s;
+    height: 0px;
+    display: none;
+    overflow: hidden;
+}
+
+#list .note_row_selected{
+    background-color:  rgb(235, 233, 222);
+}
+
+#list button{
+    background-color: white;
+    border-radius: 5px;
+    border: 1px solid rgb(185, 185, 185);
+    transition: 0.2s;
+    box-shadow: 0 2px 2px 0 rgba(0, 0, 0, 0.2), 0 2px 2px 0 rgba(0, 0, 0, 0.19);
+    /* padding: 5px; */
+}
+
+#list button:hover{
+    background-color: rgb(224, 223, 161);
+}
+
+#list #file-upload-button{
+    background-color: white;
+    border-radius: 5px;
+    border: 1px solid rgb(185, 185, 185);
+    transition: 0.2s;
+    box-shadow: 0 2px 2px 0 rgba(0, 0, 0, 0.2), 0 2px 2px 0 rgba(0, 0, 0, 0.19);
+    /* padding: 5px; */
+}
+
+#list #file-upload-button:hover{
+    background-color: rgb(224, 223, 161);
+}
+
+#list .action_button{
+    width: 24px;
+    height: 24px;
+    margin: 2px;
+    padding: 1px;
+}
+#list .action_button i{
+    font-size: 18px !important;
+}
+#list .big_icon_button{
+    width: 60px;
+    height: 60px;
+    margin-bottom: 25px;
+    margin-right: 20px;
+    padding: 1px;
+}
+#list .icon_button{
+    width: 28px;
+    height: 28px;
+    margin-bottom: 15px;
+    padding: 1px;
+}
+#list .save_button{
+    background-color: rgb(207, 206, 104);
+}
+#list input[type=text]{
+    border: 0px solid transparent;
+    border-bottom: 1.5px solid rgb(165, 165, 165);
+    transition: 0.2s;
+}
+#list input[type=text]:focus{
+    outline: none;
+    border: 0px solid transparent;
+    border-bottom: 1.5px solid rgb(3, 164, 204);
+}
+#list input[type=date]{
+    font-family: sans-serif;
+    border: 0px solid transparent;
+    border-bottom: 1.5px solid rgb(165, 165, 165);
+    transition: 0.2s;
+}
+#list input[type=date]:focus{
+    outline: none;
+    border: 0px solid transparent;
+    border-bottom: 1.5px solid rgb(3, 164, 204);
+}
+#search_field{
+    width: 300px;
+}
+
+#list_popup_mask{
+    display: none;
+    position: fixed;
+    z-index: 1;
+    left: 0;
+    top: 0;
+    width: 100vw;
+    height: 100vh;
+    overflow: auto;
+    background-color: rgba(0,0,0,0);
+    transition: background-color 0.5s;
+}
+
+#list_popup {
+    position: fixed;
+    left: calc(50vw - 400px);
+    top: -1000px;
+    background-color: white;
+    border: 0px solid transparent;
+    border-radius: 20px;
+    width: 800px;
+    min-height: 400px;
+    transition: top 0.5s;
+}
+
+#list_popup_content{
+    height: 400px;
+    padding: 20px;
+    border-bottom: 1px solid rgb(214, 214, 214);
+}
+
+#list_popup_control{
+    height: 24px;
+    padding: 10px;
+    text-align: right;
+    width: calc(100% - 20px);
+}
+
+.edit_form_input{
+    width: 500px;
+}
+
+.logo{
+    position: relative;
+    bottom: 10px;
+}
+
+#print_div{
+    display: none;
+}
+
+@media print {
+    div {
+        display: none;
+    }
+    #print_div {
+        display: block !important;
+    }
+}
