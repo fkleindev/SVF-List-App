@@ -4,10 +4,10 @@ body{
 }
 #list{
     /* border: 1px solid rgb(185, 185, 185); */
-    width: calc(100vw - 250px);
-    margin-left: 100px;
-    height: calc(100vh - 250px);
-    margin-top: 100px;
+    width: calc(100vw - 120px);
+    margin-left: 40px;
+    height: calc(100vh - 120px);
+    margin-top: 40px;
     box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
     padding: 20px;
 }
