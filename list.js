@@ -203,40 +203,72 @@ function buildPrintForm(){
     var html = "";
     html += "<table style='width: 100%;'>";
         html += "<tr>";
-            html += "<td>Datum 1:</td>";
-            html += '<td><input type="date" class="print_form_input" id="date1_input"></td>';
+            html += "<td>Wochentag(e):</td>";
+            html += '<td>';
+                html += 'Montag: <input type="checkbox" id="monday_checkbox"><br>';
+                html += 'Dienstag: <input type="checkbox" id="tuesday_checkbox"><br>';
+                html += 'Mittwoch: <input type="checkbox" id="wednesday_checkbox"><br>';
+                html += 'Donnerstag: <input type="checkbox" id="thursday_checkbox"><br>';
+                html += 'Freitag: <input type="checkbox" id="friday_checkbox"><br>';
+                html += 'Samstag: <input type="checkbox" id="saturday_checkbox"><br>';
+                html += 'Sonntag: <input type="checkbox" id="sunday_checkbox"><br>';
+            html += '</td>'
         html += "</tr><br>";
         html += "<tr>";
-            html += "<td>Datum 2:</td>";
-            html += '<td><input type="date" class="print_form_input" id="date2_input"></td>';
-        html += "</tr><br>";
-        html += "<tr>";
-            html += "<td>Datum 3:</td>";
-            html += '<td><input type="date" class="print_form_input" id="date3_input"></td>';
-        html += "</tr><br>";
-        html += "<tr>";
-            html += "<td>Datum 4:</td>";
-            html += '<td><input type="date" class="print_form_input" id="date4_input"></td>';
-        html += "</tr><br>";
-        html += "<tr>";
-            html += "<td>Datum 5:</td>";
-            html += '<td><input type="date" class="print_form_input" id="date5_input"></td>';
-        html += "</tr><br>";
-        html += "<tr>";
-            html += "<td>Datum 6:</td>";
-            html += '<td><input type="date" class="print_form_input" id="date6_input"></td>';
-        html += "</tr><br>";
-        html += "<tr>";
-            html += "<td>Datum 7:</td>";
-            html += '<td><input type="date" class="print_form_input" id="date7_input"></td>';
-        html += "</tr><br>";
-        html += "<tr>";
-            html += "<td>Datum 8:</td>";
-            html += '<td><input type="date" class="print_form_input" id="date8_input"></td>';
+            html += "<td>Monat:</td>";
+            html += '<td><input type="month" class="print_form_input" id="month_input"></td>';
         html += "</tr><br>";
     html += "</table>";
 
     $("#list_popup_content").html(html);
+}
+
+function getDates() {
+    var month_date = $("#month_input").val();
+    var days = [];
+    var input_date = new Date(month_date);
+    var month = input_date.getMonth();
+    var year = input_date.getFullYear();
+
+    var selected_weekdays = [];
+
+    if($("#monday_checkbox").prop('checked')){
+        selected_weekdays.push(1);
+    }
+    if($("#tuesday_checkbox").prop('checked')){
+        selected_weekdays.push(2);
+    }
+    if($("#wednesday_checkbox").prop('checked')){
+        selected_weekdays.push(3);
+    }
+    if($("#thursday_checkbox").prop('checked')){
+        selected_weekdays.push(4);
+    }
+    if($("#friday_checkbox").prop('checked')){
+        selected_weekdays.push(5);
+    }
+    if($("#saturday_checkbox").prop('checked')){
+        selected_weekdays.push(6);
+    }
+    if($("#sunday_checkbox").prop('checked')){
+        selected_weekdays.push(0);
+    }
+    console.log(selected_weekdays);
+
+    for(var i = 1; i <= 31; i++){
+        var day = new Date(year, month, i);
+        if(day.getMonth() != month){
+            continue;
+        }
+
+        var weekday = day.getDay();
+        
+        if(selected_weekdays.includes(weekday)){
+            days.push(day);
+        }
+    }
+    
+    return days;
 }
 
 function buildPrintControl(){
@@ -406,43 +438,15 @@ function printList() {
 }
 
 function getPrintHTML(){
-    var date1 = $("#date1_input").val();
-    var date2 = $("#date2_input").val();
-    var date3 = $("#date3_input").val();
-    var date4 = $("#date4_input").val();
-    var date5 = $("#date5_input").val();
-    var date6 = $("#date6_input").val();
-    var date7 = $("#date7_input").val();
-    var date8 = $("#date8_input").val();
+    var dates = getDates();
 
     var html = "";
     html += '<img src="images/svf_logo.png" height="80px"> <b style="font-size: 24px">Trainingsliste</b><br><br>';
     html += '<table style="width: 100%; font-family: sans-serif; font-size: 12px; border-collapse: collapse;">';
         html += '<tr>';
-        if(date1){
-            html += '<th width="">' + date1 + '</th>';
-        }
-        if(date2){
-            html += '<th width="">' + date2 + '</th>';
-        }
-        if(date3){
-            html += '<th width="">' + date3 + '</th>';
-        }
-        if(date4){
-            html += '<th width="">' + date4 + '</th>';
-        }
-        if(date5){
-            html += '<th width="">' + date5 + '</th>';
-        }
-        if(date6){
-            html += '<th width="">' + date6 + '</th>';
-        }
-        if(date7){
-            html += '<th width="">' + date7 + '</th>';
-        }
-        if(date8){
-            html += '<th width="">' + date8 + '</th>';
-        }
+        $.each(dates, function( index, date ) {
+            html += '<th width="">' + date.toLocaleString("de-DE", {dateStyle: "short"}) + '</th>';
+        });
             html += '<th>Nachname</th>';
             html += '<th>Vorname</th>';
             html += '<th>Adresse</th>';
@@ -450,30 +454,9 @@ function getPrintHTML(){
         html += '</tr>';
     $.each(list_store,function(i, entry){
         html += '<tr height="20px" style="border: 1px solid black; page-break: avoid;">';
-        if(date1){
+        $.each(dates, function( index, date ) {
             html += '<td style="border: 1px solid black; page-break: avoid; padding: 2px;"></td>';
-        }
-        if(date2){
-            html += '<td style="border: 1px solid black; page-break: avoid; padding: 2px;"></td>';
-        }
-        if(date3){
-            html += '<td style="border: 1px solid black; page-break: avoid; padding: 2px;"></td>';
-        }
-        if(date4){
-            html += '<td style="border: 1px solid black; page-break: avoid; padding: 2px;"></td>';
-        }
-        if(date5){
-            html += '<td style="border: 1px solid black; page-break: avoid; padding: 2px;"></td>';
-        }
-        if(date6){
-            html += '<td style="border: 1px solid black; page-break: avoid; padding: 2px;"></td>';
-        }
-        if(date7){
-            html += '<td style="border: 1px solid black; page-break: avoid; padding: 2px;" ></td>';
-        }
-        if(date8){
-            html += '<td style="border: 1px solid black; page-break: avoid; padding: 2px;" ></td>';
-        }
+        });
             html += '<td style="border: 1px solid black; page-break: avoid; padding: 2px;">' + entry.Nachname + '</td>';
             html += '<td style="border: 1px solid black; page-break: avoid; padding: 2px;">' + entry.Vorname + '</td>';
             html += '<td style="border: 1px solid black; page-break: avoid; padding: 2px;">' + entry.Adresse + '</td>';
