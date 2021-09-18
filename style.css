@@ -226,6 +226,10 @@ body{
     display: none;
 }
 
+#title_input{
+    margin-right: 20px;
+}
+
 @media print {
     div {
         display: none;

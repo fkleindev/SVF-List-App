@@ -1,4 +1,5 @@
 var list_store = [];
+var list_title = "";
 
 function startList(){
     buildComponent();
@@ -57,10 +58,11 @@ function buildControlbar(){
         '<table width="100%"><tr>' +
             '<td width="10%"><img src="images/svf_logo.png" height="80px" class="logo"></td>' +
             '<td width="90%">' +
-                '<button class="big_icon_button" onclick="newEntry()"><i class="material-icons">add</i><br>Neu</button>' +
+                'Titel: <input type="text" id="title_input"></input>' + 
                 '<input type="file" id="file_input"></input>' +
                 '<button class="big_icon_button" onclick="importList()"><i class="material-icons">upload</i><br>Import</button>' +
                 '<button class="big_icon_button" onclick="downloadList()"><i class="material-icons">download</i><br>Export</button>' +
+                '<button class="big_icon_button" onclick="newEntry()"><i class="material-icons">add</i><br>Neu</button>' +
                 '<button class="big_icon_button" onclick="openPrintWindow()"><i class="material-icons">print</i><br>Drucken</button>' +
             '</td>' +
         '</tr></table>';
@@ -399,9 +401,14 @@ function getHighestID(){
 }
 
 function downloadList(){
+    var download_list = {
+        title: $("#title_input").val(),
+        array: list_store
+    };
+
     $("<a />", {
         "download": "list.json",
-        "href" : "data:application/json," + encodeURIComponent(JSON.stringify(list_store))
+        "href" : "data:application/json," + encodeURIComponent(JSON.stringify(download_list))
       }).appendTo("body")
       .click(function() {
          $(this).remove()
@@ -415,6 +422,10 @@ function importList(){
         reader.readAsText(file);
         reader.onload = function(e) {
             new_list_store = JSON.parse(e.target.result);
+            if(!$.isArray(new_list_store)){
+                $("#title_input").val(new_list_store.title);
+                new_list_store = new_list_store.array;
+            }
             list_store = [];
             var id = 1;
             $.each(new_list_store,function(i, entry){
@@ -439,7 +450,7 @@ function getPrintHTML(){
     var dates = getDates();
 
     var html = "";
-    html += '<img src="images/svf_logo.png" height="80px"> <b style="font-size: 24px">Trainingsliste</b><br><br>';
+    html += '<img src="images/svf_logo.png" height="80px"> <b style="font-size: 24px">' + $("#title_input").val() + '</b><br><br>';
     html += '<table style="width: 100%; font-family: sans-serif; font-size: 12px; border-collapse: collapse;">';
         html += '<tr>';
         $.each(dates, function( index, date ) {
