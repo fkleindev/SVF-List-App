@@ -253,7 +253,6 @@ function getDates() {
     if($("#sunday_checkbox").prop('checked')){
         selected_weekdays.push(0);
     }
-    console.log(selected_weekdays);
 
     for(var i = 1; i <= 31; i++){
         var day = new Date(year, month, i);
@@ -351,7 +350,6 @@ function buildEditControl(entry){
 }
 
 function closeEditWindow(save = false, id = -1){
-    console.log(id);
     if(save){
         if(id != -1){
             var index = getIndexById(id);
