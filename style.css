@@ -196,12 +196,12 @@ body{
     border: 0px solid transparent;
     border-radius: 20px;
     width: 800px;
-    min-height: 400px;
+    min-height: 500px;
     transition: top 0.5s;
 }
 
 #list_popup_content{
-    height: 400px;
+    height: 500px;
     padding: 20px;
     border-bottom: 1px solid rgb(214, 214, 214);
 }

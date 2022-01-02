@@ -198,7 +198,7 @@ function openPrintWindow(){
     $("#list_popup_mask").css("display", "block");
 
     setTimeout(function() {
-        $("#list_popup").css("top", "200px");
+        $("#list_popup").css("top", "100px");
         $("#list_popup_mask").css("background-color", "rgba(0,0,0,0.4)")
     }, 1);
 }
@@ -229,11 +229,11 @@ function buildPrintForm(mode = "month"){
                     html += 'Samstag: <input type="checkbox" id="saturday_checkbox"><br>';
                     html += 'Sonntag: <input type="checkbox" id="sunday_checkbox"><br>';
                 html += '</td>'
-            html += "</tr><br>";
+            html += "</tr>";
             html += "<tr>";
                 html += "<td>Monat:</td>";
                 html += '<td><input type="month" class="print_form_input" id="month_input"></td>';
-            html += "</tr><br>";
+            html += "</tr>";
         html += "</table>";
     }
     else if(mode == "manual_dates"){
@@ -241,35 +241,83 @@ function buildPrintForm(mode = "month"){
             html += "<tr>";
                 html += "<td>Datum 1:</td>";
                 html += '<td><input type="date" class="print_form_input" id="date1_input"></td>';
-            html += "</tr><br>";
+            html += "</tr>";
             html += "<tr>";
                 html += "<td>Datum 2:</td>";
                 html += '<td><input type="date" class="print_form_input" id="date2_input"></td>';
-            html += "</tr><br>";
+            html += "</tr>";
             html += "<tr>";
                 html += "<td>Datum 3:</td>";
                 html += '<td><input type="date" class="print_form_input" id="date3_input"></td>';
-            html += "</tr><br>";
+            html += "</tr>";
             html += "<tr>";
                 html += "<td>Datum 4:</td>";
                 html += '<td><input type="date" class="print_form_input" id="date4_input"></td>';
-            html += "</tr><br>";
+            html += "</tr>";
             html += "<tr>";
                 html += "<td>Datum 5:</td>";
                 html += '<td><input type="date" class="print_form_input" id="date5_input"></td>';
-            html += "</tr><br>";
+            html += "</tr>";
             html += "<tr>";
                 html += "<td>Datum 6:</td>";
                 html += '<td><input type="date" class="print_form_input" id="date6_input"></td>';
-            html += "</tr><br>";
+            html += "</tr>";
             html += "<tr>";
                 html += "<td>Datum 7:</td>";
                 html += '<td><input type="date" class="print_form_input" id="date7_input"></td>';
-            html += "</tr><br>";
+            html += "</tr>";
             html += "<tr>";
                 html += "<td>Datum 8:</td>";
                 html += '<td><input type="date" class="print_form_input" id="date8_input"></td>';
-            html += "</tr><br>";
+            html += "</tr>";
+            html += "<tr>";
+                html += "<td>Datum 9:</td>";
+                html += '<td><input type="date" class="print_form_input" id="date9_input"></td>';
+            html += "</tr>";
+            html += "<tr>";
+                html += "<td>Datum 10:</td>";
+                html += '<td><input type="date" class="print_form_input" id="date10_input"></td>';
+            html += "</tr>";
+            html += "<tr>";
+                html += "<td>Datum 11:</td>";
+                html += '<td><input type="date" class="print_form_input" id="date11_input"></td>';
+            html += "</tr>";
+            html += "<tr>";
+                html += "<td>Datum 12:</td>";
+                html += '<td><input type="date" class="print_form_input" id="date12_input"></td>';
+            html += "</tr>";
+            html += "<tr>";
+                html += "<td>Datum 13:</td>";
+                html += '<td><input type="date" class="print_form_input" id="date13_input"></td>';
+            html += "</tr>";
+            html += "<tr>";
+                html += "<td>Datum 14:</td>";
+                html += '<td><input type="date" class="print_form_input" id="date14_input"></td>';
+            html += "</tr>";
+            html += "<tr>";
+                html += "<td>Datum 15:</td>";
+                html += '<td><input type="date" class="print_form_input" id="date15_input"></td>';
+            html += "</tr>";
+            html += "<tr>";
+                html += "<td>Datum 16:</td>";
+                html += '<td><input type="date" class="print_form_input" id="date16_input"></td>';
+            html += "</tr>";
+            html += "<tr>";
+                html += "<td>Datum 17:</td>";
+                html += '<td><input type="date" class="print_form_input" id="date17_input"></td>';
+            html += "</tr>";
+            html += "<tr>";
+                html += "<td>Datum 18:</td>";
+                html += '<td><input type="date" class="print_form_input" id="date18_input"></td>';
+            html += "</tr>";
+            html += "<tr>";
+                html += "<td>Datum 19:</td>";
+                html += '<td><input type="date" class="print_form_input" id="date19_input"></td>';
+            html += "</tr>";
+            html += "<tr>";
+                html += "<td>Datum 20:</td>";
+                html += '<td><input type="date" class="print_form_input" id="date20_input"></td>';
+            html += "</tr>";
         html += "</table>";
     }
 
@@ -323,7 +371,7 @@ function getDates() {
         }
     }
     else if(print_mode == "manual_dates"){
-        for(var i = 1; i <= 8; i++){
+        for(var i = 1; i <= 20; i++){
             var date_string = $("#date" + i + "_input").val();
             if(date_string){
                 var day = new Date(date_string);
