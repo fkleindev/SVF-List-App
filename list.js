@@ -1,5 +1,6 @@
 var list_store = [];
 var list_title = "";
+var print_mode = "month";
 
 function startList(){
     buildComponent();
@@ -58,7 +59,7 @@ function buildControlbar(){
         '<table width="100%"><tr>' +
             '<td width="10%"><img src="images/svf_logo.png" height="80px" class="logo"></td>' +
             '<td width="90%">' +
-                'Titel: <input type="text" id="title_input"></input>' + 
+                'Titel: <input type="text" id="title_input"></input>' +
                 '<input type="file" id="file_input"></input>' +
                 '<button class="big_icon_button" onclick="importList()"><i class="material-icons">upload</i><br>Import</button>' +
                 '<button class="big_icon_button" onclick="downloadList()"><i class="material-icons">download</i><br>Export</button>' +
@@ -191,7 +192,8 @@ function openPrintWindow(){
     var html = '<div id="list_popup_content"></div><div id="list_popup_control"></div>';
 
     $("#list_popup").html(html);
-    buildPrintForm();
+    buildPrintModeSelect();
+    // buildPrintForm();
     buildPrintControl();
     $("#list_popup_mask").css("display", "block");
 
@@ -201,74 +203,135 @@ function openPrintWindow(){
     }, 1);
 }
 
-function buildPrintForm(){
+function buildPrintModeSelect(){
     var html = "";
-    html += "<table style='width: 100%;'>";
-        html += "<tr>";
-            html += "<td>Wochentag(e):</td>";
-            html += '<td>';
-                html += 'Montag: <input type="checkbox" id="monday_checkbox"><br>';
-                html += 'Dienstag: <input type="checkbox" id="tuesday_checkbox"><br>';
-                html += 'Mittwoch: <input type="checkbox" id="wednesday_checkbox"><br>';
-                html += 'Donnerstag: <input type="checkbox" id="thursday_checkbox"><br>';
-                html += 'Freitag: <input type="checkbox" id="friday_checkbox"><br>';
-                html += 'Samstag: <input type="checkbox" id="saturday_checkbox"><br>';
-                html += 'Sonntag: <input type="checkbox" id="sunday_checkbox"><br>';
-            html += '</td>'
-        html += "</tr><br>";
-        html += "<tr>";
-            html += "<td>Monat:</td>";
-            html += '<td><input type="month" class="print_form_input" id="month_input"></td>';
-        html += "</tr><br>";
-    html += "</table>";
+    html += "<br>";
+    html += "<button onclick=buildPrintForm('month')>Monat auswählen</button><br>";
+    html += "<br>";
+    html += "<button onclick=buildPrintForm('manual_dates')>Tage manuell auswählen</button><br>";
+
+    $("#list_popup_content").html(html);
+}
+
+function buildPrintForm(mode = "month"){
+    var html = "";
+    print_mode = mode;
+    if(mode == "month"){
+        html += "<table style='width: 100%;'>";
+            html += "<tr>";
+                html += "<td>Wochentag(e):</td>";
+                html += '<td>';
+                    html += 'Montag: <input type="checkbox" id="monday_checkbox"><br>';
+                    html += 'Dienstag: <input type="checkbox" id="tuesday_checkbox"><br>';
+                    html += 'Mittwoch: <input type="checkbox" id="wednesday_checkbox"><br>';
+                    html += 'Donnerstag: <input type="checkbox" id="thursday_checkbox"><br>';
+                    html += 'Freitag: <input type="checkbox" id="friday_checkbox"><br>';
+                    html += 'Samstag: <input type="checkbox" id="saturday_checkbox"><br>';
+                    html += 'Sonntag: <input type="checkbox" id="sunday_checkbox"><br>';
+                html += '</td>'
+            html += "</tr><br>";
+            html += "<tr>";
+                html += "<td>Monat:</td>";
+                html += '<td><input type="month" class="print_form_input" id="month_input"></td>';
+            html += "</tr><br>";
+        html += "</table>";
+    }
+    else if(mode == "manual_dates"){
+        html += "<table style='width: 100%;'>";
+            html += "<tr>";
+                html += "<td>Datum 1:</td>";
+                html += '<td><input type="date" class="print_form_input" id="date1_input"></td>';
+            html += "</tr><br>";
+            html += "<tr>";
+                html += "<td>Datum 2:</td>";
+                html += '<td><input type="date" class="print_form_input" id="date2_input"></td>';
+            html += "</tr><br>";
+            html += "<tr>";
+                html += "<td>Datum 3:</td>";
+                html += '<td><input type="date" class="print_form_input" id="date3_input"></td>';
+            html += "</tr><br>";
+            html += "<tr>";
+                html += "<td>Datum 4:</td>";
+                html += '<td><input type="date" class="print_form_input" id="date4_input"></td>';
+            html += "</tr><br>";
+            html += "<tr>";
+                html += "<td>Datum 5:</td>";
+                html += '<td><input type="date" class="print_form_input" id="date5_input"></td>';
+            html += "</tr><br>";
+            html += "<tr>";
+                html += "<td>Datum 6:</td>";
+                html += '<td><input type="date" class="print_form_input" id="date6_input"></td>';
+            html += "</tr><br>";
+            html += "<tr>";
+                html += "<td>Datum 7:</td>";
+                html += '<td><input type="date" class="print_form_input" id="date7_input"></td>';
+            html += "</tr><br>";
+            html += "<tr>";
+                html += "<td>Datum 8:</td>";
+                html += '<td><input type="date" class="print_form_input" id="date8_input"></td>';
+            html += "</tr><br>";
+        html += "</table>";
+    }
 
     $("#list_popup_content").html(html);
 }
 
 function getDates() {
-    var month_date = $("#month_input").val();
     var days = [];
-    var input_date = new Date(month_date);
-    var month = input_date.getMonth();
-    var year = input_date.getFullYear();
+    if(print_mode == "month"){
+        var month_date = $("#month_input").val();
 
-    var selected_weekdays = [];
+        var input_date = new Date(month_date);
+        var month = input_date.getMonth();
+        var year = input_date.getFullYear();
 
-    if($("#monday_checkbox").prop('checked')){
-        selected_weekdays.push(1);
-    }
-    if($("#tuesday_checkbox").prop('checked')){
-        selected_weekdays.push(2);
-    }
-    if($("#wednesday_checkbox").prop('checked')){
-        selected_weekdays.push(3);
-    }
-    if($("#thursday_checkbox").prop('checked')){
-        selected_weekdays.push(4);
-    }
-    if($("#friday_checkbox").prop('checked')){
-        selected_weekdays.push(5);
-    }
-    if($("#saturday_checkbox").prop('checked')){
-        selected_weekdays.push(6);
-    }
-    if($("#sunday_checkbox").prop('checked')){
-        selected_weekdays.push(0);
-    }
+        var selected_weekdays = [];
 
-    for(var i = 1; i <= 31; i++){
-        var day = new Date(year, month, i);
-        if(day.getMonth() != month){
-            continue;
+        if($("#monday_checkbox").prop('checked')){
+            selected_weekdays.push(1);
+        }
+        if($("#tuesday_checkbox").prop('checked')){
+            selected_weekdays.push(2);
+        }
+        if($("#wednesday_checkbox").prop('checked')){
+            selected_weekdays.push(3);
+        }
+        if($("#thursday_checkbox").prop('checked')){
+            selected_weekdays.push(4);
+        }
+        if($("#friday_checkbox").prop('checked')){
+            selected_weekdays.push(5);
+        }
+        if($("#saturday_checkbox").prop('checked')){
+            selected_weekdays.push(6);
+        }
+        if($("#sunday_checkbox").prop('checked')){
+            selected_weekdays.push(0);
         }
 
-        var weekday = day.getDay();
-        
-        if(selected_weekdays.includes(weekday)){
-            days.push(day);
+        for(var i = 1; i <= 31; i++){
+            var day = new Date(year, month, i);
+            if(day.getMonth() != month){
+                continue;
+            }
+
+            var weekday = day.getDay();
+
+            if(selected_weekdays.includes(weekday)){
+                days.push(day);
+            }
         }
     }
-    
+    else if(print_mode == "manual_dates"){
+        for(var i = 1; i <= 8; i++){
+            var date_string = $("#date" + i + "_input").val();
+            if(date_string){
+                var day = new Date(date_string);
+                days.push(day);
+            }
+        }
+    }
+
     return days;
 }
 
