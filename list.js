@@ -86,8 +86,11 @@ function buildTable(){
                         'Vorname:' +
                     '</th>' +
                     '<th class="header_cell">' +
-                        'Adresse:' +
+                        'Jahrgang:' +
                     '</th>' +
+                    // '<th class="header_cell">' +
+                    //     'Adresse:' +
+                    // '</th>' +
                     '<th class="header_cell">' +
                         'Telefon:' +
                     '</th>' +
@@ -158,7 +161,8 @@ function refreshGrid(search_text = null){
                     '<td>' + entry.id + '</td>' +
                     '<td>' + entry.Nachname + '</td>' +
                     '<td>' + entry.Vorname + '</td>' +
-                    '<td>' + entry.Adresse + '</td>' +
+                    '<td>' + entry.Jahrgang + '</td>' +
+                    // '<td>' + entry.Adresse + '</td>' +
                     '<td>' + entry.Telefon + '</td>' +
                     '<td style="text-align: right">' +
                         '<button onclick="openEditWindow(' + entry.id + ')" class="edit_button action_button"><i class="material-icons">edit</i></button>' +
@@ -321,6 +325,12 @@ function buildPrintForm(mode = "month"){
         html += "</table>";
     }
 
+    html += '<br>Schwimmkurs oder Schwimmtraining?<br>' +
+            '<select id="kurs_or_training_select">' +
+                '<option value="schwimmkurs">Schwimmkurs</option>' +
+                '<option value="schwimmtraining">Schwimmtraining</option>' +
+            '</select>';
+
     $("#list_popup_content").html(html);
 }
 
@@ -410,7 +420,7 @@ function openEditWindow(entry_id){
     $("#list_popup_mask").css("display", "block");
 
     setTimeout(function() {
-        $("#list_popup").css("top", "200px");
+        $("#list_popup").css("top", "100px");
         $("#list_popup_mask").css("background-color", "rgba(0,0,0,0.4)")
     }, 1);
 }
@@ -418,6 +428,7 @@ function openEditWindow(entry_id){
 function buildEditForm(entry){
     var nachname = "";
     var vorname = "";
+    var jahrgang = "";
     var adresse = "";
     var telefon = "";
 
@@ -425,6 +436,7 @@ function buildEditForm(entry){
         nachname = entry.Nachname;
         vorname = entry.Vorname;
         adresse = entry.Adresse;
+        jahrgang = entry.Jahrgang;
         telefon = entry.Telefon;
     }
     var html = "";
@@ -438,9 +450,13 @@ function buildEditForm(entry){
             html += '<td><input type="text" class="edit_form_input" id="vorname_input" value ="' + vorname +'"></td>';
         html += "</tr><br>";
         html += "<tr>";
-            html += "<td>Adresse:</td>";
-            html += '<td><input type="text" class="edit_form_input" id="adresse_input" value ="' + adresse +'"></td>';
+            html += "<td>Jahrgang:</td>";
+            html += '<td><input type="text" class="edit_form_input" id="jahrgang_input" value ="' + jahrgang +'"></td>';
         html += "</tr><br>";
+        // html += "<tr>";
+        //     html += "<td>Adresse:</td>";
+        //     html += '<td><input type="text" class="edit_form_input" id="adresse_input" value ="' + adresse +'"></td>';
+        // html += "</tr><br>";
         html += "<tr>";
             html += "<td>Telefon:</td>";
             html += '<td><input type="text" class="edit_form_input" id="telefon_input" value ="' + telefon +'"></td>';
@@ -466,10 +482,11 @@ function closeEditWindow(save = false, id = -1){
     if(save){
         if(id != -1){
             var index = getIndexById(id);
-            if(index){
+            if(index !== false){
                 list_store[index].Nachname = $("#nachname_input").val();
                 list_store[index].Vorname = $("#vorname_input").val();
-                list_store[index].Adresse = $("#adresse_input").val();
+                list_store[index].Jahrgang = $("#jahrgang_input").val();
+                // list_store[index].Adresse = $("#adresse_input").val();
                 list_store[index].Telefon = $("#telefon_input").val();
             }
         }
@@ -478,12 +495,13 @@ function closeEditWindow(save = false, id = -1){
                                 id: getHighestID() + 1,
                                 Nachname: $("#nachname_input").val(),
                                 Vorname: $("#vorname_input").val(),
-                                Adresse: $("#adresse_input").val(),
+                                Jahrgang: $("#jahrgang_input").val(),
+                                // Adresse: $("#adresse_input").val(),
                                 Telefon: $("#telefon_input").val()
                             };
             list_store.push(new_entry);
         }
-
+        console.log($("#jahrgang_input").val());
         refreshGrid();
     }
 
@@ -542,6 +560,9 @@ function importList(){
             $.each(new_list_store,function(i, entry){
                 entry.id = id;
                 entry.Notiz = "";
+                if(!entry.Jahrgang){
+                    entry.Jahrgang = "";
+                }
                 list_store.push(entry);
                 id++;
             });
@@ -559,28 +580,44 @@ function printList() {
 
 function getPrintHTML(){
     var dates = getDates();
+    var is_kurs = false;
+    if($("#kurs_or_training_select").val() == "schwimmkurs"){
+        is_kurs = true;
+    }
 
     var html = "";
     html += '<img src="images/svf_logo.png" height="80px"> <b style="font-size: 24px">' + $("#title_input").val() + '</b><br><br>';
-    html += '<table style="width: 100%; font-family: sans-serif; font-size: 12px; border-collapse: collapse;">';
+    html += '<table class="print_table" style="width: 100%; font-family: sans-serif; font-size: 12px; border-collapse: collapse;">';
         html += '<tr>';
         $.each(dates, function( index, date ) {
-            html += '<th width="">' + date.toLocaleString("de-DE", {dateStyle: "short"}) + '</th>';
+            html +=     '<th>' + date.toLocaleString("de-DE", {dateStyle: "short"}) + '</th>';
         });
-            html += '<th>Nachname</th>';
-            html += '<th>Vorname</th>';
-            html += '<th>Adresse</th>';
-            html += '<th>Telefon</th>';
+        html +=     '<th>Nachname</th>';
+        html +=     '<th>Vorname</th>';
+        // html +=  '<th>Adresse</th>';
+        html +=     '<th>Jahrgang</th>';
+        html +=     '<th>Telefon</th>';
+        if(is_kurs){
+            html += '<th>Seepferdchen</th>';
+            html += '<th>Neuer Kurs</th>';
+            html += '<th>Förderkurs</th>';
+        }
         html += '</tr>';
     $.each(list_store,function(i, entry){
-        html += '<tr height="20px" style="border: 1px solid black; page-break: avoid;">';
+        html += '<tr height="30px" style="border: 1px solid black; page-break: avoid;">';
         $.each(dates, function( index, date ) {
             html += '<td style="border: 1px solid black; page-break: avoid; padding: 2px;"></td>';
         });
-            html += '<td style="border: 1px solid black; page-break: avoid; padding: 2px;">' + entry.Nachname + '</td>';
-            html += '<td style="border: 1px solid black; page-break: avoid; padding: 2px;">' + entry.Vorname + '</td>';
-            html += '<td style="border: 1px solid black; page-break: avoid; padding: 2px;">' + entry.Adresse + '</td>';
-            html += '<td style="border: 1px solid black; page-break: avoid; padding: 2px;">' + entry.Telefon + '</td>';
+        html +=     '<td style="border: 1px solid black; page-break: avoid; padding: 2px;">' + entry.Nachname + '</td>';
+        html +=     '<td style="border: 1px solid black; page-break: avoid; padding: 2px;">' + entry.Vorname + '</td>';
+        // html +=  '<td style="border: 1px solid black; page-break: avoid; padding: 2px;">' + entry.Adresse + '</td>';
+        html +=     '<td style="border: 1px solid black; page-break: avoid; padding: 2px;">' + entry.Jahrgang + '</td>';
+        html +=     '<td style="border: 1px solid black; page-break: avoid; padding: 2px;">' + entry.Telefon + '</td>';
+        if(is_kurs){
+            html += '<td style="border: 1px solid black; page-break: avoid; padding: 2px;"></td>';
+            html += '<td style="border: 1px solid black; page-break: avoid; padding: 2px;"></td>';
+            html += '<td style="border: 1px solid black; page-break: avoid; padding: 2px;"></td>';
+        }
         html += '</tr>';
     });
     html += '</table>';
