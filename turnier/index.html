@@ -1,0 +1,301 @@
+<!doctype html>
+<html lang="de">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Schwimmturnier — Startkarten Generator (one-page, jQuery)</title>
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  <style>
+    body{font-family:system-ui,Segoe UI,Roboto,Arial;margin:18px;color:#111}
+    h1{font-size:1.6rem}
+    .col{display:inline-block;vertical-align:top;margin-right:16px}
+    .box{border:1px solid #ddd;padding:12px;border-radius:8px;min-width:300px}
+    label{display:block;margin-top:8px}
+    input[type=text], input[type=number], select{width:100%;padding:6px;margin-top:4px}
+    table{width:100%;border-collapse:collapse;margin-top:8px}
+    th,td{border:1px solid #eee;padding:6px;text-align:left}
+    .controls{margin-top:8px}
+    button{padding:8px 10px;margin-right:6px}
+    .small{font-size:0.9rem}
+    .heat{border:1px dashed #999;padding:8px;margin:6px 0}
+    @media print{
+      body>*:not(.print-area){display:none}
+      .print-area{display:block}
+    }
+  </style>
+</head>
+<body>
+  <h1>Schwimmturnier — Startkarten Generator</h1>
+  <div class="col box" style="width:340px">
+    <h2>Wettkämpfe</h2>
+    <div>
+      <label>Wettkampf-Name (z.B. "100m Brust")</label>
+      <input id="eventName" type="text">
+      <div class="controls">
+        <button id="addEvent">Wettkampf anlegen</button>
+      </div>
+    </div>
+    <hr>
+    <div>
+      <label>Wettkämpfe</label>
+      <select id="events" size="8" style="width:100%"></select>
+      <div class="controls">
+        <button id="removeEvent">Ausgewählten löschen</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="col box" style="width:420px">
+    <h2>Teilnehmer</h2>
+    <div>
+      <label>Name</label>
+      <input id="pname" type="text">
+      <label>Jahrgang (z.B. 2008)</label>
+      <input id="pyear" type="number" min="1900" max="2100">
+      <div class="controls">
+        <button id="addParticipant">Teilnehmer hinzufügen</button>
+        <button id="removeParticipant">Ausgewählten Teilnehmer löschen</button>
+      </div>
+    </div>
+    <div style="margin-top:10px">
+      <label>Teilnehmer im ausgewählten Wettkampf</label>
+      <table id="participantsTable"><thead><tr><th></th><th>Name</th><th>Jg.</th></tr></thead><tbody></tbody></table>
+    </div>
+  </div>
+
+  <div class="col box" style="width:320px">
+    <h2>Aktionen</h2>
+    <div class="controls">
+      <button id="assignHeats">Läufe einteilen</button>
+      <button id="printStartcards">Startkarten drucken</button>
+      <button id="printHeatcards">Laufkarten drucken</button>
+    </div>
+    <hr>
+    <h3>Daten</h3>
+    <div class="controls">
+      <button id="exportJson">Export (JSON herunterladen)</button>
+      <input id="importFile" type="file" accept="application/json">
+      <div class="small" style="margin-top:8px">Automatisch in localStorage gespeichert.</div>
+    </div>
+  </div>
+
+  <div style="clear:both;margin-top:16px"></div>
+
+  <div class="box" id="heatsBox">
+    <h2>Einteilung der Läufe</h2>
+    <div id="heatsList">Noch keine Einteilung.</div>
+  </div>
+
+  <div id="printArea" class="print-area" style="display:none;margin-top:12px"></div>
+
+  <script>
+    // Datenstruktur: { events: [ { id, name, participants: [ {id,name,year} ], heats: [ [pId,...], ... ] } ] }
+    const MAX_LANES = 5;
+    let data = { events: [] };
+
+    function uid(prefix='id'){return prefix+Math.random().toString(36).slice(2,9)}
+
+    // Load from localStorage
+    function load(){
+      const raw = localStorage.getItem('swim_tournament_v1');
+      if(raw){ try{ data=JSON.parse(raw);}catch(e){console.error('load failed',e)} }
+      renderEvents();
+    }
+    function save(){ localStorage.setItem('swim_tournament_v1', JSON.stringify(data)); }
+
+    // UI helpers
+    function renderEvents(){
+      const $sel = $('#events').empty();
+      data.events.forEach(ev=>{
+        $sel.append($('<option>').val(ev.id).text(ev.name+' ('+ (ev.participants.length)+' Teilnehmer)'));
+      });
+      renderParticipants();
+    }
+
+    function getSelectedEvent(){ const id = $('#events').val(); return data.events.find(e=>e.id===id); }
+
+    function renderParticipants(){
+      const ev = getSelectedEvent();
+      const $tb = $('#participantsTable tbody').empty();
+      if(!ev) return;
+      ev.participants.forEach(p=>{
+        const $tr = $('<tr>');
+        $tr.append($('<td>').html('<input type="radio" name="selp" value="'+p.id+'">'));
+        $tr.append($('<td>').text(p.name));
+        $tr.append($('<td>').text(p.year));
+        $tb.append($tr);
+      });
+    }
+
+    // Events
+    $('#addEvent').on('click', ()=>{
+      const name = $('#eventName').val().trim(); if(!name){alert('Name angeben');return}
+      const ev = { id: uid('ev_'), name, participants: [], heats: [] };
+      data.events.push(ev); $('#eventName').val(''); save(); renderEvents();
+    });
+
+    $('#removeEvent').on('click', ()=>{
+      const id = $('#events').val(); if(!id){alert('Wettkampf auswählen');return}
+      if(!confirm('Wettkampf löschen?')) return;
+      data.events = data.events.filter(e=>e.id!==id); save(); renderEvents();
+    });
+
+    $('#events').on('change', ()=>{ renderParticipants(); $('#heatsList').html('Noch keine Einteilung.'); });
+
+    // Participants
+    $('#addParticipant').on('click', ()=>{
+      const ev = getSelectedEvent(); if(!ev){alert('Wettkampf auswählen');return}
+      const name = $('#pname').val().trim();
+      let year = $('#pyear').val();
+      if(year){
+        year = parseInt(year);
+      }
+      else{
+        year = null;
+      }
+      if(!name){alert('Name angeben');return}
+      ev.participants.push({ id: uid('p_'), name, year });
+      $('#pname').val(''); $('#pyear').val(''); save(); renderEvents();
+    });
+
+    $('#removeParticipant').on('click', ()=>{
+      const ev = getSelectedEvent(); if(!ev){alert('Wettkampf auswählen');return}
+      const pid = $('input[name=selp]:checked').val(); if(!pid){alert('Teilnehmer auswählen');return}
+      ev.participants = ev.participants.filter(p=>p.id!==pid); save(); renderParticipants();
+    });
+
+    // Heats assignment algorithm
+    function assignHeatsForEvent(ev) {
+        const maxLanes = MAX_LANES;
+        const parts = ev.participants.slice().sort((a, b) => {
+          let a_compare = 0;
+          let b_compare = 0;
+          if(a.year){
+            a_compare = a.year;
+          }
+          if(b.year){
+            b_compare  = b.year;
+          }
+          return b_compare - a_compare;
+        });
+        const n = parts.length;
+        if (n === 0) { ev.heats = []; return; }
+
+
+        const heatsCount = Math.ceil(n / maxLanes);
+        // Option 2: möglichst gleichmäßige Läufe, aber nicht mit Minilauf am Ende
+        let base = Math.floor(n / heatsCount);
+        let extra = n % heatsCount;
+        const sizes = []; for (let i = 0; i < heatsCount; i++) sizes.push(i < extra ? base + 1 : base);
+
+
+        // Jahrgänge ähnlich halten → sequential füllen, da sortiert
+        const heats = []; let idx = 0;
+        for (let s of sizes) { const h = []; for (let i = 0; i < s; i++) h.push(parts[idx++].id); heats.push(h); }
+        ev.heats = heats;
+    }
+
+    $('#assignHeats').on('click', ()=>{
+      const ev = getSelectedEvent(); if(!ev){alert('Wettkampf auswählen');return}
+      assignHeatsForEvent(ev);
+      save(); renderHeats(ev);
+    });
+
+    function renderHeats(ev){
+      if(!ev) $('#heatsList').html('Kein Wettkampf ausgewählt.');
+      else if(!ev.heats || ev.heats.length===0) $('#heatsList').html('Noch keine Einteilung. Drücke "Läufe einteilen".');
+      else{
+        const html = [];
+        ev.heats.forEach((heat,hi)=>{
+          html.push('<div class="heat"><strong>Wettkampf:</strong> '+ev.name+' — <strong>Lauf</strong> '+(hi+1)+'<br>');
+          html.push('<table><thead><tr><th>Bahn</th><th>Name</th><th>Jg.</th></tr></thead><tbody>');
+          for(let lane=0;lane<MAX_LANES;lane++){
+            const pid = heat[lane];
+            if(pid){ const p = ev.participants.find(x=>x.id===pid); html.push('<tr><td>'+(lane+1)+'</td><td>'+escapeHtml(p.name)+'</td><td>'+p.year+'</td></tr>'); }
+            else html.push('<tr><td>'+(lane+1)+'</td><td>—</td><td>—</td></tr>');
+          }
+          html.push('</tbody></table></div>');
+        });
+        $('#heatsList').html(html.join(''));
+      }
+    }
+
+    // Print startcards
+    $('#printStartcards').on('click', ()=>{
+      const ev = getSelectedEvent(); if(!ev){alert('Wettkampf auswählen');return}
+      assignHeatsForEvent(ev);
+      save(); renderHeats(ev);
+      // build printable area
+      const parts = [];
+      ev.heats.forEach((heat,hi)=>{
+        parts.push('<div style="page-break-inside:avoid;margin-bottom:18px">');
+        parts.push('<h2>'+escapeHtml(ev.name)+ ' — Lauf '+(hi+1)+'</h2>');
+        parts.push('<table style="width:100%;border-collapse:collapse;border:1px solid #000"><thead><tr><th style="border:1px solid #000;padding:6px">Bahn</th><th style="border:1px solid #000;padding:6px">Name</th><th style="border:1px solid #000;padding:6px">Jg.</th><th style="border:1px solid #000;padding:6px">Zeit</th></tr></thead><tbody>');
+        for(let lane=0;lane<MAX_LANES;lane++){
+          const pid = heat[lane];
+          if(pid){ const p = ev.participants.find(x=>x.id===pid); parts.push('<tr><td style="border:1px solid #000;padding:6px">'+(lane+1)+'</td><td style="border:1px solid #000;padding:6px">'+escapeHtml(p.name)+'</td><td style="border:1px solid #000;padding:6px">'+ (p.year ?? '')+'</td><td style="border:1px solid #000;padding:6px"></td></tr>'); }
+          else parts.push('<tr><td style="border:1px solid #000;padding:6px">'+(lane+1)+'</td><td style="border:1px solid #000;padding:6px">—</td><td style="border:1px solid #000;padding:6px">—</td><td style="border:1px solid #000;padding:6px"></td></tr>');
+        }
+        parts.push('</tbody></table></div>');
+      });
+      $('#printArea').html(parts.join('')).show();
+      window.print();
+    //   after print hide (optional)
+      $('#printArea').hide();
+    });
+
+    // Print heat cards (individual cards per participant)
+    $('#printHeatcards').on('click', ()=>{
+      const ev = getSelectedEvent(); if(!ev){alert('Wettkampf auswählen');return}
+      assignHeatsForEvent(ev);
+      save(); renderHeats(ev);
+      // build printable area with individual cards for each participant
+      const parts = [];
+      ev.heats.forEach((heat,hi)=>{
+        for(let lane=0;lane<heat.length;lane++){
+          const pid = heat[lane];
+          if(pid){
+            const p = ev.participants.find(x=>x.id===pid);
+            parts.push('<div style="page-break-inside:avoid;border:2px solid #000;padding:10px;margin-bottom:20px;width:600px">');
+            parts.push('<h3 style="margin-top:0;text-align:center">'+escapeHtml(ev.name)+'</h3>');
+            parts.push('<div style="font-size:14px;margin-bottom:6px">');
+            parts.push('<p style="margin:4px 0"><strong>Name:</strong> '+escapeHtml(p.name)+'  |  <strong>Jahrgang.:</strong> '+(p.year ?? '')+'</p>');
+            parts.push('<p style="margin:4px 0"><strong>Lauf:</strong> '+(hi+1)+'  |  <strong>Bahn:</strong> '+(lane+1)+'</p>');
+            parts.push('</div>');
+            parts.push('<div style="border-top:1px solid #000;padding-top:12px;margin-top:6px;text-align:center">');
+            parts.push('<p style="margin:0 0 8px 0;font-size:14px"><strong>Zeit</strong></p>');
+            parts.push('<div style="border:1px solid #000;height:40px;padding:8px"></div>');
+            parts.push('</div>');
+            parts.push('</div>');
+          }
+        }
+      });
+      $('#printArea').html(parts.join('')).show();
+      window.print();
+      $('#printArea').hide();
+    });
+
+    // Export / Import
+    $('#exportJson').on('click', ()=>{
+      const blob = new Blob([JSON.stringify(data, null, 2)], {type: 'application/json'});
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a'); a.href=url; a.download = 'swim_tournament_export.json'; document.body.appendChild(a); a.click(); a.remove(); URL.revokeObjectURL(url);
+    });
+
+    $('#importFile').on('change', (e)=>{
+      const f = e.target.files[0]; if(!f) return; const reader = new FileReader();
+      reader.onload = function(evts){ try{ const imported = JSON.parse(evts.target.result); if(!imported.events) throw 'Invalid'; data = imported; save(); renderEvents(); alert('Import erfolgreich'); }catch(err){ alert('Import Fehler: '+err); } }
+      reader.readAsText(f);
+    });
+
+    // small helpers
+    function escapeHtml(s){ return String(s).replace(/[&<>"']/g, function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":"&#39;"}[c]; }); }
+
+    // init
+    load();
+
+    // expose for debugging
+    window._swimData = data;
+  </script>
+</body>
+</html>
